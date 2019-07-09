@@ -1,4 +1,4 @@
-package gomarketcap
+package gomarketparse
 
 import (
 	"encoding/csv"
