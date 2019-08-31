@@ -9,12 +9,12 @@ import (
 const BASE_URL = "https://coinmarketcap.com/currencies"
 
 type Parser struct {
-	*colly.Collector
+	c *colly.Collector
 }
 
 func NewParser() Parser {
 	return Parser{
-		colly.NewCollector(),
+		c: colly.NewCollector(),
 	}
 }
 
@@ -22,7 +22,7 @@ func (p *Parser) GetHistoricalData(currency string, from time.Time, to time.Time
 	url := createURL(currency, from, to)
 	records := Records{}
 
-	p.OnHTML("#historical-data", func(e *colly.HTMLElement) {
+	p.c.OnHTML("#historical-data", func(e *colly.HTMLElement) {
 
 		e.ForEach("tr", func(i int, el *colly.HTMLElement) {
 			// Skip table headers
@@ -41,7 +41,7 @@ func (p *Parser) GetHistoricalData(currency string, from time.Time, to time.Time
 		})
 	})
 
-	p.Visit(url)
+	p.c.Visit(url)
 
 	return records
 }
