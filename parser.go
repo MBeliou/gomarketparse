@@ -22,19 +22,19 @@ func (p *Parser) GetHistoricalData(currency string, from time.Time, to time.Time
 	url := createURL(currency, from, to)
 	records := Records{}
 
-	p.c.OnHTML("#historical-data", func(e *colly.HTMLElement) {
+	p.c.OnHTML(".cmc-tab-historical-data", func(e *colly.HTMLElement) {
 
 		e.ForEach("tr", func(i int, el *colly.HTMLElement) {
 			// Skip table headers
 			if i != 0 {
 				record := Record{
 					Date:      el.ChildText("td:nth-of-type(1)"),
-					Open:      el.ChildAttr("td:nth-of-type(2)", "data-format-value"),
-					High:      el.ChildAttr("td:nth-of-type(3)", "data-format-value"),
-					Low:       el.ChildAttr("td:nth-of-type(4)", "data-format-value"),
-					Close:     el.ChildAttr("td:nth-of-type(5)", "data-format-value"),
-					Volume:    el.ChildAttr("td:nth-of-type(6)", "data-format-value"),
-					MarketCap: el.ChildAttr("td:nth-of-type(7)", "data-format-value"),
+					Open:      el.ChildText("td:nth-of-type(2)"),
+					High:      el.ChildText("td:nth-of-type(3)"),
+					Low:       el.ChildText("td:nth-of-type(4)"),
+					Close:     el.ChildText("td:nth-of-type(5)"),
+					Volume:    el.ChildText("td:nth-of-type(6)"),
+					MarketCap: el.ChildText("td:nth-of-type(7)"),
 				}
 				records = append(records, record)
 			}
