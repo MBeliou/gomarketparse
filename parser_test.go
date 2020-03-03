@@ -1,6 +1,7 @@
 package gomarketparse
 
 import (
+	"fmt"
 	"testing"
 	"time"
 )
@@ -12,5 +13,9 @@ func TestParse(t *testing.T) {
 
 	if len(records) < 1 {
 		t.Errorf("Got an empty result")
+	}
+	fmt.Printf("Got date: %v\n", records[0].Date)
+	if records[0].Date == "" {
+		t.Errorf("Got an empty date")
 	}
 }

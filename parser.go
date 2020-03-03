@@ -1,6 +1,7 @@
 package gomarketparse
 
 import (
+	"strconv"
 	"strings"
 	"time"
 
@@ -8,6 +9,7 @@ import (
 )
 
 const BASE_URL = "https://coinmarketcap.com/currencies"
+const timeLayout = "Jan 2, 2006"
 
 type Parser struct {
 	c *colly.Collector
@@ -27,18 +29,23 @@ func (p *Parser) GetHistoricalData(currency string, from time.Time, to time.Time
 
 		e.ForEach("tr", func(i int, el *colly.HTMLElement) {
 			// NOTE: Skipping table headers.
-			if i != 0 {
 
-				record := Record{
-					Date:      el.ChildText("td:nth-of-type(1)"),
-					Open:      strings.ReplaceAll(el.ChildText("td:nth-of-type(2)"), ",", ""),
-					High:      strings.ReplaceAll(el.ChildText("td:nth-of-type(3)"), ",", ""),
-					Low:       strings.ReplaceAll(el.ChildText("td:nth-of-type(4)"), ",", ""),
-					Close:     strings.ReplaceAll(el.ChildText("td:nth-of-type(5)"), ",", ""),
-					Volume:    strings.ReplaceAll(el.ChildText("td:nth-of-type(6)"), ",", ""),
-					MarketCap: strings.ReplaceAll(el.ChildText("td:nth-of-type(7)"), ",", ""),
+			if i != 0 {
+				dateStr := el.ChildText("td:nth-of-type(1)")
+
+				if dateStr != "" {
+					date, _ := time.Parse(timeLayout, dateStr)
+					record := Record{
+						Date:      strconv.FormatInt(date.Unix(), 10),
+						Open:      strings.ReplaceAll(el.ChildText("td:nth-of-type(2)"), ",", ""),
+						High:      strings.ReplaceAll(el.ChildText("td:nth-of-type(3)"), ",", ""),
+						Low:       strings.ReplaceAll(el.ChildText("td:nth-of-type(4)"), ",", ""),
+						Close:     strings.ReplaceAll(el.ChildText("td:nth-of-type(5)"), ",", ""),
+						Volume:    strings.ReplaceAll(el.ChildText("td:nth-of-type(6)"), ",", ""),
+						MarketCap: strings.ReplaceAll(el.ChildText("td:nth-of-type(7)"), ",", ""),
+					}
+					records = append(records, record)
 				}
-				records = append(records, record)
 			}
 		})
 	})
