@@ -1,6 +1,7 @@
 package gomarketparse
 
 import (
+	"strings"
 	"time"
 
 	"github.com/gocolly/colly"
@@ -25,16 +26,17 @@ func (p *Parser) GetHistoricalData(currency string, from time.Time, to time.Time
 	p.c.OnHTML(".cmc-tab-historical-data", func(e *colly.HTMLElement) {
 
 		e.ForEach("tr", func(i int, el *colly.HTMLElement) {
-			// Skip table headers
+			// NOTE: Skipping table headers.
 			if i != 0 {
+
 				record := Record{
 					Date:      el.ChildText("td:nth-of-type(1)"),
-					Open:      el.ChildText("td:nth-of-type(2)"),
-					High:      el.ChildText("td:nth-of-type(3)"),
-					Low:       el.ChildText("td:nth-of-type(4)"),
-					Close:     el.ChildText("td:nth-of-type(5)"),
-					Volume:    el.ChildText("td:nth-of-type(6)"),
-					MarketCap: el.ChildText("td:nth-of-type(7)"),
+					Open:      strings.ReplaceAll(el.ChildText("td:nth-of-type(2)"), ",", ""),
+					High:      strings.ReplaceAll(el.ChildText("td:nth-of-type(3)"), ",", ""),
+					Low:       strings.ReplaceAll(el.ChildText("td:nth-of-type(4)"), ",", ""),
+					Close:     strings.ReplaceAll(el.ChildText("td:nth-of-type(5)"), ",", ""),
+					Volume:    strings.ReplaceAll(el.ChildText("td:nth-of-type(6)"), ",", ""),
+					MarketCap: strings.ReplaceAll(el.ChildText("td:nth-of-type(7)"), ",", ""),
 				}
 				records = append(records, record)
 			}
